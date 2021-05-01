@@ -1,0 +1,59 @@
+.header a.logo {
+  width: calc(0.05 * 4805px); height: calc(0.05 * 500px);
+  display: block; border-color: black; border-width: 2px;
+  background: #ffffff url(FBhorizontalLockup.png) no-repeat center center; background-size: contain;
+}
+
+@media screen and (max-width: 500px) {
+  .header a {float: none; display: block; text-align: left;}
+  .header-right {float: none;}
+}
+
+/*-------*/
+/*  MAP  */
+/*-------*/
+#map-sec {height: 85vh; float: left}
+#map {height: 100%;}
+
+path, circle {transition: fill 0.5s}
+
+path:hover, circle:hover {
+  stroke: maroon !important; stroke-width:2px; stroke-linejoin: round; fill: maroon !important; cursor: pointer;}
+
+#path67 {fill: none !important; stroke: #A9A9A9 !important; cursor: default;}
+
+#hover-box {
+  display: block; visibility: hidden; transition: visibility 0.2s; position: absolute; left: 0px; z-index: 1;
+  background-color: #ffe6e6; border: 2px solid maroon; border-radius: 5px;
+  font-family: arial; padding: 5px; top: 0px;}
+
+/*------*/
+/* TEXT */
+/*------*/
+
+#choose {
+  display: block; word-wrap: break-word; background-color: #ffe6e6; border: 2px solid maroon; border-radius: 5px;
+  /*max-width: 30%; top: 10%; left: 55%; position: absolute; */
+  max-width: 30%; top: 30%; left: 30%; position: absolute; /*visibility: hidden;*/
+  z-index: 0; padding: 5px; font-family: arial;
+}
+.img {max-width: 100%; max-height: 40vh;
+  display: block; margin-left: auto; margin-right: auto;}
+
+.circles
+{
+  height: 25vh;
+  width: 40vw;
+  background-color: LightGray;
+}
+
+/*#info-box hr {visibility: hidden}*/
+
+#info-box
+{
+  display: block
+  height: 75vh;
+}
+/*--------*/
+/* FOOTER */
+/*--------*/
