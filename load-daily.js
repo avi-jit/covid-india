@@ -185,6 +185,7 @@ Promise.all([p_metro, p_us, p_state, p_istate, p_idistrict]).then(raw => {
     rows.forEach(function(row) {
       if (row[1] > popl && row[1] < popu && row[2] > deathl && row[2] < deathu)
         { data.push(row)}
+      else {console.log(row)}
     })
   })
 
