@@ -88,8 +88,7 @@ var p_metro = new Promise(function(passfn, failfn)
 
 var p_us = new Promise(function(passfn, failfn)
 {
-  d3.json("https://api.covidactnow.org/v2/country/US.json?apiKey=448c8a7cc13d43a7b8b0740570b74dda", function(raw){
-    var data = [['US', raw['population'], raw['actuals']['deaths']]]
+    var data = [['US', 331_486_822, 3_329]]
     console.log(data[0])
     passfn(data)
   })
