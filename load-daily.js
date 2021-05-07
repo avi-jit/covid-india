@@ -22,13 +22,13 @@ var svg = d3.select("#my_dataviz")
           "translate(" + margin.left + "," + margin.top + ")");
 
   svg.append("text")
-    .attr("x",width/2)
+    .attr("x",width * 0.8)
     .attr("y",height-(margin.bottom * 0.95))
     .text("Population (log scale)")
 
   svg.append("text")
-    .attr("x",margin.left*2)
-    .attr("y",height/10)
+    .attr("x",margin.left*3)
+    .attr("y",height/20)
     .attr("text-anchor","middle")
     //.attr("transform",`translate(${margin.left/2},${height/2}) rotate(270)`)
     .text("Peak Daily Deaths (7 day avg) (log scale)")
