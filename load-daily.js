@@ -73,14 +73,8 @@ var p_metro = new Promise(function(passfn, failfn)
             parseInt(x['Population']),
             parseInt(x['NewDeaths'])
           ]) }
-        else {console.log([
-            map[x['CBSA']].split("-")[0]+"+",
-            parseInt(x['Population']),
-            parseInt(x['NewDeaths'])
-          ])}
       });
-      console.log('metro:')
-      console.log(data)
+      console.log(data[0])
       passfn(data)
     })
   })
@@ -91,16 +85,17 @@ var p_us = new Promise(function(passfn, failfn)
     var data = [['US', 331_486_822, 3_329]]
     console.log(data[0])
     passfn(data)
-  })
 })
 
 var p_state = new Promise(function(passfn, failfn)
 {
-  d3.json("https://api.covidactnow.org/v2/states.json?apiKey=448c8a7cc13d43a7b8b0740570b74dda", function(raw){
+  d3.csv("https://raw.githubusercontent.com/avi-jit/covid-india/main/us_state_daily.csv", function(raw){
+    // State,NewDeaths,Population
+    // AK,5,731545
     var data = []
     raw.forEach(function(row) {
-      if (parseInt(row['population'])>popl)
-      { data.push([row['state'], row['population'], row['actuals']['deaths']])}
+      if (parseInt(row['Population'])>popl)
+      { data.push([row['State'], row['Population'], row['NewDeaths']])}
     })
     console.log(data[0])
     passfn(data)
@@ -109,12 +104,30 @@ var p_state = new Promise(function(passfn, failfn)
 
 var p_istate = new Promise(function(passfn, failfn)
 {
-  d3.csv("https://api.covid19india.org/csv/latest/state_wise.csv", function(raw){ // also has Delta_Deaths
+  d3.csv("https://api.covid19india.org/csv/latest/state_wise_daily.csv", function(raw){
+    //Date,Date_YMD,Status,TT,AN,AP,AR,AS,BR,CH,CT,DN,DD,DL,GA,GJ,HR,HP,JK,JH,KA,KL,LA,LD,MP,MH,MN,ML,MZ,NL,OR,PY,PB,RJ,SK,TN,TG,TR,UP,UT,WB,UN
     var deaths = {}
+    //deaths['India'] = 0
+    for (var [key, value] of Object.entries(raw[0])) {
+      if (key.length != 2) { continue }
+      deaths[key] = parseInt(value) * undercount
+      deaths['India'] = deaths['India'] + deaths[key]
+    }
     raw.forEach(function(row) {
-      deaths[row['State']] = parseInt(row['Deaths']) * undercount
+      if (row['Status'] == 'Deceased') {
+        var sum = 0;
+        for (var [key, value] of Object.entries(row)) {
+          if (key.length != 2) { continue }
+          value = parseInt(value) * undercount
+          //console.log(`${key}: ${value}`)
+          sum = sum + value
+          deaths[key] = Math.max(value, deaths[key])
+        }
+        deaths['India'] = Math.max(sum, deaths['India'])
+        console.log(deaths)
+        //deaths[row['State']] = parseInt(row['Deaths']) * undercount
+      }
     })
-    deaths['India'] = deaths['Total']
     console.log(`India: ${deaths['India']}`)
 
     d3.csv("https://raw.githubusercontent.com/avi-jit/covid-india/main/state_pop.csv", function(raw){
