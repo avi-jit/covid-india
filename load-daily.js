@@ -3,8 +3,8 @@ var figw = 900
 var figh = 700
 var popl = 7_000_000
 var popu = 1_350_000_000
-var deathl = 100
-var deathu = 1_000
+var deathl = 1
+var deathu = 1_000_000
 var undercount = 30
 
 // set the dimensions and margins of the graph
@@ -62,21 +62,25 @@ var p_metro = new Promise(function(passfn, failfn)
     //console.log(`level 1: ${map['10100']}`) // runs later
     //return map
     d3.csv("https://raw.githubusercontent.com/avi-jit/covid-india/main/metro_daily.csv", function(raw){
-      // CBSA,NewDeaths
-      // 10100,2
+      console.log(raw[0])
+      // CBSA,NewDeaths,Population
+      // 10100,2,42668
       var data = []
       raw.forEach(function(x) {
-        if (parseInt(x['population'])>popl)
+        if (parseInt(x['Population'])>popl)
         { data.push( [
             map[x['CBSA']].split("-")[0]+"+",
-            parseInt(x['population']),
+            parseInt(x['Population']),
             parseInt(x['NewDeaths'])
           ]) }
+        else {console.log([
+            map[x['CBSA']].split("-")[0]+"+",
+            parseInt(x['Population']),
+            parseInt(x['NewDeaths'])
+          ])}
       });
-      //console.log(`level 2: ${data.length}`) // runs later
-      //return data
-      //data_metro = data
-      console.log(data[0])
+      console.log('metro:')
+      console.log(data)
       passfn(data)
     })
   })
