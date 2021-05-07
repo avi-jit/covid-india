@@ -28,10 +28,10 @@ var svg = d3.select("#my_dataviz")
 
   svg.append("text")
     .attr("x",margin.left*2)
-    .attr("y",height/8)
+    .attr("y",height/10)
     .attr("text-anchor","middle")
     //.attr("transform",`translate(${margin.left/2},${height/2}) rotate(270)`)
-    .text("Total Deaths (log scale)")
+    .text("Peak Daily Deaths (7 day avg) (log scale)")
 
 
 //$.getScript("load.js", function(){
