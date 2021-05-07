@@ -4,7 +4,7 @@ var figh = 700
 var popl = 7_000_000
 var popu = 1_350_000_000
 var deathl = 1
-var deathu = 1_000_000
+var deathu = 45_000
 var undercount = 30
 
 // set the dimensions and margins of the graph
@@ -197,10 +197,15 @@ var p_idistrict = new Promise(function(passfn, failfn)
 Promise.all([p_metro, p_us, p_state, p_istate, p_idistrict]).then(raw => {
 	//const data1 = raw[0]
   data = []
+  defaults = ['CA','US','Delhi','Los']
   raw.forEach(function(rows) {
     rows.forEach(function(row) {
       if (row[1] > popl && row[1] < popu && row[2] > deathl && row[2] < deathu)
-        { data.push(row)}
+        {
+          if (defaults.includes(row[0])) { row.push('block') }
+          else {row.push('none')}
+          data.push(row)
+        }
       else {console.log(row)}
     })
   })
@@ -215,50 +220,66 @@ Promise.all([p_metro, p_us, p_state, p_istate, p_idistrict]).then(raw => {
         .append('button')
         .text(function(d){return d[0]})
         .attr('class', 'buttons m-1')
-        .attr('data',function(d){return d[0]+'@'+d[1]+'@'+d[2]})
+        .attr('data',function(d){return d[0].split('+')[0].split(' ')[0] +'@'+d[1]+'@'+d[2]+'@'+d[3]})
+        .style("background-color", function(d) {
+          if (d[3] == 'block') { return 'yellow'}
+          else { return 'white'}
+          } );
         //.attr('onclick','clickfn()')
 
-  data1 = []
   // Add dots
   svg.append('g')
     .selectAll("dot")
-    .data(data1)
+    .data(data)
     .enter()
     .append("circle")
+      .attr('class', function(d) { return d[0].split('+')[0].split(' ')[0]} )
       .attr("cx", function (d) { return x(d[1]) } )
       .attr("cy", function (d) { return y(d[2]) } )
       .attr("r", 3)
       .style("fill", "red")
+      .style("display", function(d) { return d[3]} );
 
   // Add labels
   svg.append('g')
     .selectAll("label")
-    .data(data1)
+    .data(data)
     .enter()
     .append("text")
+      .attr('class', function(d) { return d[0].split('+')[0].split(' ')[0] } )
       .attr("x", function (d) { return x(d[1]) + 5 } )
       .attr("y", function (d) { return y(d[2]) + 5 } )
       .attr("font-size","big")
       .text(function (d) { return d[0] })
+      .style("display", function(d) { return d[3]} );
 
   $('.buttons').click(function(){
-    console.log('button clicked')
     var d = $(this).attr('data').split('@')
-    d[1] = parseInt(d[1])
-    d[2] = parseInt(d[2])
-    console.log(d)
+    console.log('button: '+d)
+    //d[1] = parseInt(d[1])
+    //d[2] = parseInt(d[2])
 
-    svg.append('circle')
-      .attr("cx", x(d[1]) )
-      .attr("cy", y(d[2]) )
-      .attr("r", 3)
-      .style("fill", "red")
+    var color
+    if (d[3] == 'block') { d[3] = 'none' ; color = 'white'}
+    else { d[3] = 'block'; color = 'yellow'}
+    console.log(d.join('@'))
 
-    svg.append("text")
-      .attr("x", x(d[1]) + 5 )
-      .attr("y", y(d[2]) + 5 )
-      .attr("font-size","big")
-      .text(d[0])
+    //$('.'+d[0]).style.display = d[3]
+    $('.'+d[0]).css("display", d[3])
+    $(this).attr('data', d.join('@'))
+    $(this).css('background-color', color)
+
+    //svg.append('circle')
+    //  .attr("cx", x(d[1]) )
+    //  .attr("cy", y(d[2]) )
+    //  .attr("r", 3)
+    //  .style("fill", "red")
+
+    //svg.append("text")
+    //  .attr("x", x(d[1]) + 5 )
+    //  .attr("y", y(d[2]) + 5 )
+    //  .attr("font-size","big")
+    //  .text(d[0])
   })
 })
 
