@@ -111,36 +111,36 @@ var p_istate = new Promise(function(passfn, failfn)
     for (var [key, value] of Object.entries(raw[0])) {
       if (key.length != 2) { continue }
       deaths[key] = parseInt(value) * undercount
-      deaths['India'] = deaths['India'] + deaths[key]
+      //deaths['India'] = deaths['India'] + deaths[key]
     }
     raw.forEach(function(row) {
       if (row['Status'] == 'Deceased') {
-        var sum = 0;
+        //var sum = 0;
         for (var [key, value] of Object.entries(row)) {
           if (key.length != 2) { continue }
           value = parseInt(value) * undercount
           //console.log(`${key}: ${value}`)
-          sum = sum + value
+          //sum = sum + value
           deaths[key] = Math.max(value, deaths[key])
         }
-        deaths['India'] = Math.max(sum, deaths['India'])
-        console.log(deaths)
+        //deaths['India'] = Math.max(sum, deaths['India'])
+        //console.log(deaths)
         //deaths[row['State']] = parseInt(row['Deaths']) * undercount
       }
     })
-    console.log(`India: ${deaths['India']}`)
+    console.log(`Goa: ${deaths['GA']}`)
 
     d3.csv("https://raw.githubusercontent.com/avi-jit/covid-india/main/state_pop.csv", function(raw){
-      // 0	State	Population	Increase	Area Density SexRatio	Literacy
-      // 1	Uttar Pradesh	199812341	20.23 %	240928	829	912	67.68
+      // 0	Code State	Population	Increase	Area Density SexRatio	Literacy
+      // 1	UP Uttar Pradesh	199812341	20.23 %	240928	829	912	67.68
       // https://www.census2011.co.in/states.php
       console.log(raw[0])
       var data = []
       raw.forEach(function(x) {
-        if (typeof deaths[x['State']]==="undefined") {console.log(x['State'])}
+        if (typeof deaths[x['Code']]==="undefined") {console.log(x['State'])}
         else
         {
-          d = parseInt(deaths[x['State']])
+          d = parseInt(deaths[x['Code']])
           if (parseInt(x['Population']) > popl && d > deathl)
           { data.push( [ x['State'],//+', '+x['State'],
             parseInt(x['Population']), d ])
