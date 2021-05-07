@@ -31,7 +31,7 @@ var svg = d3.select("#my_dataviz")
     .attr("y",height/20)
     .attr("text-anchor","middle")
     //.attr("transform",`translate(${margin.left/2},${height/2}) rotate(270)`)
-    .text("Peak Daily Deaths (7 day avg) (log scale)")
+    .text("Peak Daily Deaths (7 day avg)")
 
 
 //$.getScript("load.js", function(){
@@ -43,8 +43,8 @@ svg.append("g")
   .call(d3.axisBottom(x));
 
 // Add Y axis
-//var y = d3.scaleLinear()
-var y = d3.scaleLog()
+var y = d3.scaleLinear()
+//var y = d3.scaleLog()
   .domain([deathl, deathu])
   .range([ height, 0]);
 svg.append("g")
