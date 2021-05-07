@@ -1,6 +1,6 @@
 
-const figw = 900
-const figh = 720
+const figw = screen.width * 0.6 //900
+const figh = screen.height * 0.8 //720
 const popl = 7_000_000
 const popu = 350_000_000
 const deathl = -1_000
