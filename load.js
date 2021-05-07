@@ -196,12 +196,15 @@ Promise.all([p_metro, p_us, p_state, p_istate, p_idistrict]).then(raw => {
         .enter()
         .append('button')
         .text(function(d){return d[0]})
-        .attr('class', 'm-1')
+        .attr('class', 'buttons m-1')
+        .attr('data',function(d){return d[0]+'@'+d[1]+'@'+d[2]})
+        //.attr('onclick','clickfn()')
 
+  data1 = []
   // Add dots
   svg.append('g')
     .selectAll("dot")
-    .data(data)
+    .data(data1)
     .enter()
     .append("circle")
       .attr("cx", function (d) { return x(d[1]) } )
@@ -209,18 +212,37 @@ Promise.all([p_metro, p_us, p_state, p_istate, p_idistrict]).then(raw => {
       .attr("r", 3)
       .style("fill", "red")
 
-  // Add dots
+  // Add labels
   svg.append('g')
     .selectAll("label")
-    .data(data)
+    .data(data1)
     .enter()
     .append("text")
       .attr("x", function (d) { return x(d[1]) + 5 } )
       .attr("y", function (d) { return y(d[2]) + 5 } )
       .attr("font-size","big")
       .text(function (d) { return d[0] })
-})
 
+  $('.buttons').click(function(){
+    console.log('button clicked')
+    var d = $(this).attr('data').split('@')
+    d[1] = parseInt(d[1])
+    d[2] = parseInt(d[2])
+    console.log(d)
+
+    svg.append('circle')
+      .attr("cx", x(d[1]) )
+      .attr("cy", y(d[2]) )
+      .attr("r", 3)
+      .style("fill", "red")
+
+    svg.append("text")
+      .attr("x", x(d[1]) + 5 )
+      .attr("y", y(d[2]) + 5 )
+      .attr("font-size","big")
+      .text(d[0])
+  })
+})
 
 
 //p_metro.then(
