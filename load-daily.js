@@ -1,14 +1,18 @@
 
-var figw = 900
-var figh = 700
-var popl = 7_000_000
-var popu = 1_350_000_000
-var deathl = 1
-var deathu = 45_000
-var undercount = 30
+const figw = 900
+const figh = 720
+const popl = 7_000_000
+const popu = 350_000_000
+const deathl = -1_000
+const deathu = 15_000
+const undercount = 10
+
+const dotcolors = {'India':'red', 'US':'blue'}
+const dotsize = {'city':3, 'state':5, 'nation':10}
+const btncolor = {'none':'light', 'block':'secondary'}
 
 // set the dimensions and margins of the graph
-var margin = {top: 10, right: 30, bottom: 30, left: 60},
+var margin = {top: 10, right: 50, bottom: 60, left: 60},
     width = figw - margin.left - margin.right,
     height = figh - margin.top - margin.bottom;
 
@@ -21,34 +25,56 @@ var svg = d3.select("#my_dataviz")
     .attr("transform",
           "translate(" + margin.left + "," + margin.top + ")");
 
+  // text label for the x axis
   svg.append("text")
-    .attr("x",width * 0.8)
-    .attr("y",height-(margin.bottom * 0.95))
-    .text("Population (log scale)")
+      .attr("transform",
+            "translate(" + (width/2) + " ," + (height + margin.top + 40) + ")")
+      .style("text-anchor", "middle")
+      .style('font-size','18')
+      .text("Population (log scale)");
 
+  // text label for the y axis
   svg.append("text")
-    .attr("x",margin.left*3)
-    .attr("y",height/20)
-    .attr("text-anchor","middle")
-    //.attr("transform",`translate(${margin.left/2},${height/2}) rotate(270)`)
-    .text("Peak Daily Deaths (7 day avg)")
-
+    .attr("transform", "rotate(-90)")
+    .attr("y", 0 - margin.left)
+    .attr("x", 0 - (height / 2))
+    .attr("dy", "1em")
+    .style("text-anchor", "middle")
+    .style('font-size','18')
+    .text("Peak Daily Deaths (7 day avg)");
 
 //$.getScript("load.js", function(){
 var x = d3.scaleLog()
   .domain([popl, popu])
   .range([ 0, width ]);
+
+const m = 1_000_000
+var xAxis = d3.axisBottom(x)
+              .tickFormat(d3.format(".2s"))
+              .tickValues([7.5*m, 10*m, 20*m, 40*m, 100*m, 200*m, 300*m]);
+//xAxis = d3.svg.axis().orient("bottom").scale(x)
+
 svg.append("g")
+  .style('font-size','18')
+  .attr('class','grid')
   .attr("transform", "translate(0," + height + ")")
-  .call(d3.axisBottom(x));
+  .call(xAxis)
+  //.call(function make_x_gridlines() { return d3.axisBottom(x).ticks(5)}()
+  //        .tickSize(-height).tickFormat(""))
 
 // Add Y axis
 var y = d3.scaleLinear()
 //var y = d3.scaleLog()
   .domain([deathl, deathu])
   .range([ height, 0]);
+
+const ks = 1_000
+var yAxis = d3.axisLeft(y)
+              .tickFormat(d3.format(".1s"))
+              .tickValues([0, 2*ks, 5*ks, 10*ks, 15*ks, 20*ks, 30*ks, 50*ks])
 svg.append("g")
-  .call(d3.axisLeft(y));
+  .style('font-size','18')
+  .call(yAxis);
 
 var p_metro = new Promise(function(passfn, failfn)
 {
@@ -62,7 +88,7 @@ var p_metro = new Promise(function(passfn, failfn)
     //console.log(`level 1: ${map['10100']}`) // runs later
     //return map
     d3.csv("https://raw.githubusercontent.com/avi-jit/covid-india/main/metro_daily.csv", function(raw){
-      console.log(raw[0])
+      //console.log(raw[0])
       // CBSA,NewDeaths,Population
       // 10100,2,42668
       var data = []
@@ -82,7 +108,7 @@ var p_metro = new Promise(function(passfn, failfn)
 
 var p_us = new Promise(function(passfn, failfn)
 {
-    var data = [['US', 331_486_822, 3_329]]
+    var data = [['USA', 331_486_822, 3_329]]
     console.log(data[0])
     passfn(data)
 })
@@ -95,7 +121,7 @@ var p_state = new Promise(function(passfn, failfn)
     var data = []
     raw.forEach(function(row) {
       if (parseInt(row['Population'])>popl)
-      { data.push([row['State'], row['Population'], row['NewDeaths']])}
+      { data.push([row['State'], parseInt(row['Population']), parseInt(row['NewDeaths']) ] ) }
     })
     console.log(data[0])
     passfn(data)
@@ -124,17 +150,17 @@ var p_istate = new Promise(function(passfn, failfn)
           deaths[key] = Math.max(value, deaths[key])
         }
         //deaths['India'] = Math.max(sum, deaths['India'])
-        //console.log(deaths)
         //deaths[row['State']] = parseInt(row['Deaths']) * undercount
       }
     })
-    console.log(`Goa: ${deaths['GA']}`)
+    //console.log(`Goa: ${deaths['GA']}`)
+    console.log('India: '+ deaths['TT'])
 
     d3.csv("https://raw.githubusercontent.com/avi-jit/covid-india/main/state_pop.csv", function(raw){
       // 0	Code State	Population	Increase	Area Density SexRatio	Literacy
       // 1	UP Uttar Pradesh	199812341	20.23 %	240928	829	912	67.68
       // https://www.census2011.co.in/states.php
-      console.log(raw[0])
+      //console.log(raw[0])
       var data = []
       raw.forEach(function(x) {
         if (typeof deaths[x['Code']]==="undefined") {console.log(x['State'])}
@@ -157,36 +183,55 @@ var p_istate = new Promise(function(passfn, failfn)
 
 var p_idistrict = new Promise(function(passfn, failfn)
 {
-  d3.csv("https://api.covid19india.org/csv/latest/district_wise.csv", function(raw){
-    var deaths = {}
+  d3.csv("https://api.covid19india.org/csv/latest/districts.csv",function(raw){
+    // Date,State,District,Confirmed,Recovered,Deceased,Other,Tested
+    // 2020-04-26,Andaman and Nicobar Islands,Unknown,33,11,0,0,2679
+    var previous = {} // previous, to compare against
+    var deaths = {} // max so far
     //console.log(raw[1])
     raw.forEach(function(row) {
-      if (isNaN(row['Deceased'])){ console.log(row['District']+':'+row['Deceased']) }
-      deaths[row['District']+', '+row['State']] = parseInt(row['Deceased']) * undercount
+      k = row['District']+', '+row['State']
+      v = parseInt(row['Deceased']) * undercount
+      if (previous[k] === undefined)
+      { deaths[k] = v }
+      else
+      { //deaths[k] = v-previous[k] // most recent
+        deaths[k] = Math.max( deaths[k], v-previous[k] )
+      }
+      previous[k] = v
     })
+    console.log(deaths)
     deaths['Bangalore, Karnataka'] = deaths['Bengaluru Urban, Karnataka'] + deaths['Bengaluru Rural, Karnataka']
-    //console.log(`Lucknow: ${deaths['Lucknow, Uttar Pradesh']}`)
+    deaths['Hyderabad, Andhra Pradesh'] = deaths['Hyderabad, Telangana']
+    deaths['Ahmadabad, Gujarat'] = deaths['Ahmedabad, Gujarat']
+    deaths['Mumbai Suburban, Maharashtra'] = deaths['Mumbai, Maharashtra']
+    //deaths['North Twenty Four Parganas, West Bengal'] = deaths['North 24 Parganas, West Bengal']
+    //deaths['South Twenty Four Parganas, West Bengal'] = deaths['South 24 Parganas, West Bengal']
+    deaths['Barddhaman'] = deaths['Paschim Bardhaman'] + deaths['Purba Barddhaman']
+    console.log(`Lucknow: ${deaths['Lucknow, Uttar Pradesh']}`)
 
     d3.csv("https://raw.githubusercontent.com/avi-jit/covid-india/main/district_pop.csv", function(raw){
       // 0	District	State	Population	Growth	SexRatio	Literacy
       // 1	Thane	Maharashtra	11,060,148	36.01 %	886	84.53
       // https://www.census2011.co.in/district.php
-      console.log(raw[0])
+      //console.log(raw[0])
       var data = []
       raw.forEach(function(x) {
-        if (typeof deaths[x['District']+', '+x['State']] === "undefined")
+        key = x['District']+', '+x['State']
+        if (typeof deaths[key] === "undefined")
         {
-          if (x['Population'] > popl)
-          { console.log(x['District']+', '+x['State']) }
+          //if (parseInt(x['Population']) > popl)
+          //{ console.log('Missing: '+ key) }
         }
         else {
-          d = parseInt(deaths[x['District']+', '+x['State']])
-        if (parseInt(x['Population']) > popl && d>deathl)
-        { data.push( [ x['District'],//+', '+x['State'],
+          d = parseInt(deaths[key])
+          if (parseInt(x['Population']) > popl && d > deathl)
+          {
+            data.push( [ x['District'].split(' ')[0],//+', '+x['State'],
             parseInt(x['Population']), d ])
-          //console.log(data[data.length-1])
-        }}
-
+            //console.log(data[data.length-1])
+          }
+        }
       });
       console.log(data[0])
       passfn(data)
@@ -194,19 +239,24 @@ var p_idistrict = new Promise(function(passfn, failfn)
   })
 })
 
-Promise.all([p_metro, p_us, p_state, p_istate, p_idistrict]).then(raw => {
+Promise.all([p_state, p_metro, p_us, p_idistrict, p_istate]).then(raw => {
 	//const data1 = raw[0]
   data = []
-  defaults = ['CA','US','Delhi','Los']
-  raw.forEach(function(rows) {
+  defaults = ['CA', 'USA', 'Delhi', 'Maharashtra', 'Mumbai', 'WA', 'Bangalore', 'Chicago+', 'Tamil Nadu', 'Uttar Pradesh', 'New York+']
+  ignores = ['Murshidabad', 'Purba', 'Paschim', 'East', 'West', 'Nadia',
+            //'Bihar', 'Patna',
+            ]
+  raw.forEach(function(rows, i) {
     rows.forEach(function(row) {
-      if (row[1] > popl && row[1] < popu && row[2] > deathl && row[2] < deathu)
+      if (row[1] > popl && row[1] < popu && row[2] > deathl && row[2] < deathu && !ignores.includes(row[0]) )
         {
           if (defaults.includes(row[0])) { row.push('block') }
           else {row.push('none')}
+          if (i <= 2) { row.push('US') } else { row.push('India')}
+          if (i%2==1) { row.push('city') }
+          else { if (i == 2) { row.push('nation') } else { row.push('state') }}
           data.push(row)
         }
-      else {console.log(row)}
     })
   })
 
@@ -219,12 +269,12 @@ Promise.all([p_metro, p_us, p_state, p_istate, p_idistrict]).then(raw => {
         .enter()
         .append('button')
         .text(function(d){return d[0]})
-        .attr('class', 'buttons m-1')
+        .attr('class', function(d){ return 'btn m-1 btn-'+btncolor[d[3]] } )
         .attr('data',function(d){return d[0].split('+')[0].split(' ')[0] +'@'+d[1]+'@'+d[2]+'@'+d[3]})
-        .style("background-color", function(d) {
-          if (d[3] == 'block') { return 'yellow'}
-          else { return 'white'}
-          } );
+        //.style("background-color", function(d) {
+        //  if (d[3] == 'block') { return 'yellow'}
+        //  else { return 'white'}
+        //  } );
         //.attr('onclick','clickfn()')
 
   // Add dots
@@ -236,8 +286,8 @@ Promise.all([p_metro, p_us, p_state, p_istate, p_idistrict]).then(raw => {
       .attr('class', function(d) { return d[0].split('+')[0].split(' ')[0]} )
       .attr("cx", function (d) { return x(d[1]) } )
       .attr("cy", function (d) { return y(d[2]) } )
-      .attr("r", 3)
-      .style("fill", "red")
+      .attr("r", function(d) { return dotsize[d[5]] } )
+      .style("fill", function (d) { return dotcolors[d[4]] } )
       .style("display", function(d) { return d[3]} );
 
   // Add labels
@@ -247,39 +297,28 @@ Promise.all([p_metro, p_us, p_state, p_istate, p_idistrict]).then(raw => {
     .enter()
     .append("text")
       .attr('class', function(d) { return d[0].split('+')[0].split(' ')[0] } )
-      .attr("x", function (d) { return x(d[1]) + 5 } )
+      .attr("x", function (d) { return x(d[1]) + dotsize[d[5]] } )
       .attr("y", function (d) { return y(d[2]) + 5 } )
-      .attr("font-size","big")
+      .attr("font-size","18")
       .text(function (d) { return d[0] })
       .style("display", function(d) { return d[3]} );
 
-  $('.buttons').click(function(){
+  $('.btn').click(function(){
     var d = $(this).attr('data').split('@')
-    console.log('button: '+d)
+    //console.log('button: '+d)
     //d[1] = parseInt(d[1])
     //d[2] = parseInt(d[2])
 
     var color
-    if (d[3] == 'block') { d[3] = 'none' ; color = 'white'}
-    else { d[3] = 'block'; color = 'yellow'}
-    console.log(d.join('@'))
+    if (d[3] == 'block') { d[3] = 'none'} else { d[3] = 'block'}
+    //console.log(d.join('@'))
 
     //$('.'+d[0]).style.display = d[3]
     $('.'+d[0]).css("display", d[3])
     $(this).attr('data', d.join('@'))
-    $(this).css('background-color', color)
+    //$(this).css('background-color', color)
+    $(this).attr('class', 'btn m-1 btn-'+btncolor[d[3]])
 
-    //svg.append('circle')
-    //  .attr("cx", x(d[1]) )
-    //  .attr("cy", y(d[2]) )
-    //  .attr("r", 3)
-    //  .style("fill", "red")
-
-    //svg.append("text")
-    //  .attr("x", x(d[1]) + 5 )
-    //  .attr("y", y(d[2]) + 5 )
-    //  .attr("font-size","big")
-    //  .text(d[0])
   })
 })
 
