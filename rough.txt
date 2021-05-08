@@ -1,0 +1,35 @@
+`
+var svg = d3.select("#my_dataviz")
+  .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+  svg.append('text')
+      .attr("y", height/2)
+      .attr("x", width/2 - 200)
+      .text('Start Visualization')
+      .style('font-size','40')
+      //.attr('onclick','Start')
+      .attr('id','start')
+      .attr('fill','grey')
+      .attr('text-decoration','underline')
+      //.attr('class',"link-primary")
+      .style('cursor','pointer')
+`
+
+// <span style="color:red">Indian</span> cities are seeing many more <span class="tooltip" data-toggle="tooltip" data-placement="top" title="Y axis">daily deaths <span class="tooltiptext"> Y axis </span> </span> today than <span style="color:blue">American</span> cities with similar <span class="tooltip" data-toggle="tooltip" data-placement="top" title="X axis">populations <span class="tooltiptext"> X axis </span> </span> did, when the pandemic was peaking in the US.
+// Toggle the below buttons to add/remove regions from the plot on the left. Learn <a href="#" style="color:grey"  data-toggle="modal" data-target="#more"><u>about</u></a> the crisis and this website.
+$(document).ready(function(){
+  $('[data-toggle="tooltip"]').tooltip();
+});
+
+
+function sleep(milliseconds) {
+  const date = Date.now();
+  let currentDate = null;
+  do {
+    currentDate = Date.now();
+  } while (currentDate - date < milliseconds);
+}

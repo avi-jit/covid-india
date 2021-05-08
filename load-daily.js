@@ -1,10 +1,3 @@
-
-// <span style="color:red">Indian</span> cities are seeing many more <span class="tooltip" data-toggle="tooltip" data-placement="top" title="Y axis">daily deaths <span class="tooltiptext"> Y axis </span> </span> today than <span style="color:blue">American</span> cities with similar <span class="tooltip" data-toggle="tooltip" data-placement="top" title="X axis">populations <span class="tooltiptext"> X axis </span> </span> did, when the pandemic was peaking in the US.
-
-$(document).ready(function(){
-  $('[data-toggle="tooltip"]').tooltip();
-});
-
 const figw = screen.width * 0.6 //900
 const figh = screen.height * 0.8 //720
 const popl = 7_000_000
@@ -12,6 +5,8 @@ const popu = 350_000_000
 const deathl = -1_000
 const deathu = 15_000
 const undercount = 10
+var wait = 5000
+var transit = 1000
 
 const dotcolors = {'India':'red', 'US':'blue'}
 const dotsize = {'city':3, 'state':5, 'nation':10}
@@ -205,19 +200,35 @@ var svg = d3.select("#my_dataviz")
       .attr('text-decoration','underline')
       //.attr('class',"link-primary")
       .style('cursor','pointer')
+      .style('opacity',1)
 
 $('#start').click(async function()
 {
-  $(this).css('display','none')
+  console.log('starting...')
+  d3.select('#start').transition().duration(transit).style('opacity',0)
+  //$(this).css('display','none')
   //await new Promise(r => setTimeout(r, 2000));
 
-  // text label for the x axis
-  svg.append("text")
-      .attr("transform",
-            "translate(" + (width/2) + " ," + (height + margin.top + 40) + ")")
-      .style("text-anchor", "middle")
-      .style('font-size','18')
-      .text("Population (log scale)");
+  function write(text){
+    d3.select("#text").html("") // start from scratch
+    d3.select('#text').append('p')
+                      .style('opacity',0).attr('id','temp').attr('class','h3')
+    d3.select('#temp').html(text)
+    d3.select('#temp').transition().duration(transit).style('opacity',1)
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  // Add Intro
+  //////////////////////////////////////////////////////////////////////////
+
+  text = "This website helps Americans relate to the mind-boggling statistics of the latest Covid-19 wave in India.<br><br>Let's begin."
+  write(text)
+  await new Promise(r => setTimeout(r, wait));
+  d3.select('#temp').transition().duration(transit).style('opacity',0)
+
+  //////////////////////////////////////////////////////////////////////////
+  // Add Y axis
+  //////////////////////////////////////////////////////////////////////////
 
   // text label for the y axis
   svg.append("text")
@@ -228,6 +239,11 @@ $('#start').click(async function()
     .style("text-anchor", "middle")
     .style('font-size','18')
     .text("Peak Daily Deaths (7 day avg)");
+
+  text = "The most reliant metric for pandemic severity is the Daily Death Rate (averaged over 7 days). <br><br>We will show these on the Y axis."
+  write(text)
+  await new Promise(r => setTimeout(r, wait/2));
+
 
   //$.getScript("load.js", function(){
   var x = d3.scaleLog()
@@ -240,15 +256,6 @@ $('#start').click(async function()
                 .tickValues([7.5*m, 10*m, 20*m, 40*m, 100*m, 200*m, 300*m]);
   //xAxis = d3.svg.axis().orient("bottom").scale(x)
 
-  svg.append("g")
-    .style('font-size','18')
-    .attr('class','grid')
-    .attr("transform", "translate(0," + height + ")")
-    .call(xAxis)
-    //.call(function make_x_gridlines() { return d3.axisBottom(x).ticks(5)}()
-    //        .tickSize(-height).tickFormat(""))
-
-  // Add Y axis
   var y = d3.scaleLinear()
   //var y = d3.scaleLog()
     .domain([deathl, deathu])
@@ -257,15 +264,26 @@ $('#start').click(async function()
   const ks = 1_000
   var yAxis = d3.axisLeft(y)
                 .tickFormat(d3.format(".1s"))
-                .tickValues([0, 2*ks, 5*ks, 10*ks, 15*ks, 20*ks, 30*ks, 50*ks])
-  svg.append("g")
-    .style('font-size','18')
-    .call(yAxis);
+                .tickValues([0, 1*ks, 2*ks, 5*ks, 10*ks, 15*ks, 20*ks, 30*ks, 50*ks])
 
-  Promise.all([p_state, p_metro, p_us, p_idistrict, p_istate]).then(raw => {
+  svg.append("g")
+    .style('opacity',0)
+    .style('font-size','18')
+    .call(yAxis)
+    .attr('id','yaxis')
+
+  d3.select('#yaxis').transition().duration(transit).style('opacity',1)
+  await new Promise(r => setTimeout(r, wait));
+
+  text = "Let's see how bad things are in Bangalore, India's Silicon Valley."
+  write(text)
+  await new Promise(r => setTimeout(r, wait));
+
+  Promise.all([p_state, p_metro, p_us, p_idistrict, p_istate]).then(async function(raw){
   	//const data1 = raw[0]
     data = []
-    defaults = ['CA', 'USA', 'Delhi', 'Maharashtra', 'Mumbai', 'WA', 'Bangalore', 'Chicago+', 'Tamil Nadu', 'Uttar Pradesh', 'New York+']
+    defaults = ['Bangalore']
+    //defaults = ['CA', 'USA', 'Delhi', 'Maharashtra', 'Mumbai', 'WA', 'Bangalore', 'Chicago+', 'Tamil Nadu', 'Uttar Pradesh', 'New York+']
     ignores = ['Murshidabad', 'Purba', 'Paschim', 'East', 'West', 'Nadia',
               //'Bihar', 'Patna',
               ]
@@ -284,21 +302,6 @@ $('#start').click(async function()
     })
 
     console.log(data)
-
-    var bspace = d3.select('#bspace')
-    //bspace.append('button').text("Button 2")
-    bspace.selectAll('b')
-          .data(data)
-          .enter()
-          .append('button')
-          .text(function(d){return d[0]})
-          .attr('class', function(d){ return 'btn m-1 btn-'+btncolor[d[3]] } )
-          .attr('data',function(d){return d[0].split('+')[0].split(' ')[0] +'@'+d[1]+'@'+d[2]+'@'+d[3]})
-          //.style("background-color", function(d) {
-          //  if (d[3] == 'block') { return 'yellow'}
-          //  else { return 'white'}
-          //  } );
-          //.attr('onclick','clickfn()')
 
     // Add dots
     svg.append('g')
@@ -325,34 +328,163 @@ $('#start').click(async function()
         .attr("y", function (d) { return y(d[2]) + 5 } )
         .attr("font-size","18")
         .text(function (d) { return d[0] })
-        .style("opacity", function(d) { return d[3]} )
+        .style("opacity", function(d) { return parseInt(d[3]) } )
         //.style("display", function(d) { return d[3]} );
+
+    //////////////////////////////////////////////////////////////////////////
+    // Add Bangalore
+    //////////////////////////////////////////////////////////////////////////
+
+    text = "Hmmm ... so we have a number. But we <u><a style='color:grey' href='https://g.co/kgs/5GBev9'>should never leave a number alone</a></u>. <br><br>Let's use our X axis now to add another dimension."
+    write(text)
+    await new Promise(r => setTimeout(r, wait));
+
+    //////////////////////////////////////////////////////////////////////////
+    // Add X axis
+    //////////////////////////////////////////////////////////////////////////
+
+    svg.append("g")
+      .style('font-size','18')
+      .attr('class','grid')
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+      //.call(function make_x_gridlines() { return d3.axisBottom(x).ticks(5)}()
+      //        .tickSize(-height).tickFormat(""))
+
+    text = "Better! We now see the population of Bangalore on a log scale. <br><br>But wouldn't it be better to compare these figures to cities from the US which we know better?"
+    write(text)
+    await new Promise(r => setTimeout(r, wait));
+
+    // text label for the x axis
+    svg.append("text")
+        .attr("transform",
+              "translate(" + (width/2) + " ," + (height + margin.top + 40) + ")")
+        .style("text-anchor", "middle")
+        .style('font-size','18')
+        .text("Population (log scale)");
+
+    //////////////////////////////////////////////////////////////////////////
+    // Add LA
+    //////////////////////////////////////////////////////////////////////////
+
+    data.forEach(function(d)
+    {
+      if (d[0] == 'Los Angeles+')
+      {
+        d[3] = 1 // helps in activating button later
+        d3.select('.Los').transition().duration(transit).style("opacity",1)
+        d3.select('text.Los').transition().duration(transit).style("opacity",1)
+      }
+    })
+    text = "Oh there's the LA metropolitan area! Bangalore seems to be a little smaller than LA's worst day, yet has more cases. <br><br>Note: LA (and all of US) peaked around new year while India is peaking mid May."
+    write(text)
+    await new Promise(r => setTimeout(r, wait));
+
+    //////////////////////////////////////////////////////////////////////////
+    // Add Mumbai
+    //////////////////////////////////////////////////////////////////////////
+
+    data.forEach(function(d)
+    {
+      if (d[0] == 'Mumbai')
+      {
+        d[3] = 1 // helps in activating button later
+        d3.select('.Mumbai').transition().duration(transit).style("opacity",1)
+        d3.select('text.Mumbai').transition().duration(transit).style("opacity",1)
+      }
+    })
+
+    text = "Uh oh. Mumbai is way way worse, despite also having roughly the same population as LA or Bangalore. <br><br>Mumbai is both India's financial capital as well as the home to Bollywood: think LA and NYC in one."
+    write(text)
+    await new Promise(r => setTimeout(r, wait));
+
+
+    //////////////////////////////////////////////////////////////////////////
+    // Add CA
+    //////////////////////////////////////////////////////////////////////////
+
+    data.forEach(function(d)
+    {
+      if (d[0] == 'CA')
+      {
+        d[3] = 1 // helps in activating button later
+        d3.select('.CA').transition().duration(transit).style("opacity",1)
+        d3.select('text.CA').transition().duration(transit).style("opacity",1)
+      }
+    })
+
+    text = "Let's also see stats at the state level. There's California. Wonder how the most populous states of India are doing ..."
+    write(text)
+    await new Promise(r => setTimeout(r, wait));
+
+    //////////////////////////////////////////////////////////////////////////
+    // Add Maharashtra
+    //////////////////////////////////////////////////////////////////////////
+
+    data.forEach(function(d)
+    {
+      if (d[0] == 'Maharashtra')
+      {
+        d[3] = 1 // helps in activating button later
+        d3.select('.Maharashtra').transition().duration(transit).style("opacity",1)
+        d3.select('text.Maharashtra').transition().duration(transit).style("opacity",1)
+      }
+    })
+
+    text = "India's worst faring state is Maharashtra, home to both Mumbai - the largest epicenter - but also ironically to Serum Institute - world's largest Covid-19 vacccine manufacturer."
+    write(text)
+    await new Promise(r => setTimeout(r, wait));
+
+
+    //////////////////////////////////////////////////////////////////////////
+    // Add US
+    //////////////////////////////////////////////////////////////////////////
+
+    data.forEach(function(d)
+    {
+      if (d[0] == 'USA')
+      {
+        d[3] = 1 // helps in activating button later
+        d3.select('.USA').transition().duration(transit).style("opacity",1)
+        d3.select('text.USA').transition().duration(transit).style("opacity",1)
+      }
+    })
+
+    text = "The situtaion looks worse when we plot all of US. Mumbai has been seeing more (estimated) daily deaths than all of America combined! <br><br>Unfortunately, we could not show all of India here because it lies outside the graph."
+    write(text)
+    await new Promise(r => setTimeout(r, wait));
+
+    text = "Hope that helped. Continue to toggle the buttons below to add or remove more regions from the plot on the left. <br><br>Disclaimer: We also account for Indian undercounting. Learn <a href='#' style='color:grey' data-toggle='modal' data-target='#more'><u>about</u></a> the crisis and this website."
+    write(text)
+    await new Promise(r => setTimeout(r, wait));
+
+    var bspace = d3.select('#bspace')
+    //bspace.append('button').text("Button 2")
+    bspace.selectAll('b')
+          .data(data)
+          .enter()
+          .append('button')
+          .text(function(d){return d[0]})
+          .attr('class', function(d){ return 'btn m-1 btn-'+btncolor[d[3]] } )
+          .attr('data',function(d){return d[0].split('+')[0].split(' ')[0] +'@'+d[1]+'@'+d[2]+'@'+d[3]})
+
 
     $('.btn').click(function(){
       var d = $(this).attr('data').split('@')
       console.log('button: '+d)
-      //d[1] = parseInt(d[1])
-      //d[2] = parseInt(d[2])
 
       d[3] = 1 - parseInt(d[3])
       //if (d[3] == 'block') { d[3] = 'none'} else { d[3] = 'block'}
       //console.log(d.join('@'))
 
       //$('.'+d[0]).css("display", d[3]) // jQuery
-      d3.select('.'+d[0]).transition().duration(500).style("opacity",d[3])//d3
+      d3.select('.'+d[0]).transition().duration(transit).style("opacity",d[3])
+      d3.select('text.'+d[0]).transition().duration(transit).style("opacity",d[3])
 
       $(this).attr('data', d.join('@'))
       $(this).attr('class', 'btn m-1 btn-'+btncolor[d[3]])
 
     })
   })
+
 })
-
-
-//p_metro.then(
-//  function(data){
-//    console.log("after metro")
-//    console.log(data.length)
-//  }, // passfn
-//  function(){console.log("error")} // failfn
-//)
