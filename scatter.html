@@ -13,7 +13,7 @@
         <div class="container-fluid">
           <a class="navbar-brand" href="#">How bad is Covid-19 in India?</a>
           <div class="navbar-nav">
-            <a class="nav-item nav-link px-3" href="#" data-toggle="modal" data-target="#more">Learn More</a>
+            <a class="nav-item nav-link px-3" href="#" data-toggle="modal" data-target="#more">About</a>
             <!--a class="nav-item nav-link px-3">About Us</a-->
             <!--a class="nav-item nav-link px-3" href="https://avi-jit.github.io/covid-india/covid">Map View</a-->
             <a class="nav-item nav-link px-3" href="http://www.uscannenbergmedia.com">Annenberg Media</a>
@@ -29,22 +29,23 @@
       <div class="modal-content">
         <!-- Modal Header -->
         <div class="modal-header">
-          <h4 class="modal-title">Learn More</h4>
+          <h4 class="modal-title">About</h4>
           <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
         <!-- Modal body -->
         <div class="modal-body">
+          The creator of this website is <a href="">Avijit Thawani</a>, a PhD student at USC working on Artifical Intelligence. While recovering from Covid-19, he created this website in a desperate attempt to help fellow Americans relate to Indians during this crisis. Every Indian you know is likely losing 2-4 acquaintances to Covid-19 <b>every day</b>. Help us <a href="https://youtu.be/n1uLu0-r2tI">Fight On</a>.
+          <hr>
+          <p class="h4">Undercounting</p>
+          For multiple reasons, official case and death counts in India have been massively underreported. News reports (<a href="https://www.nytimes.com/2021/04/24/world/asia/india-coronavirus-deaths.html">NYT</a>, <a href="https://edition.cnn.com/2021/04/27/india/india-covid-underreporting-intl-hnk-dst/index.html">CNN</a>, <a href="https://www.npr.org/sections/goatsandsoda/2021/04/30/992451165/india-is-counting-thousands-of-daily-covid-deaths-how-many-is-it-missing">NPR</a>) have found an underreporting factor of 25-30x, but we have accounted for only a factor of 10.
+          <hr>
+          <p class="h4">Data</p>
           We use the following sources to fetch data for our visualizations:
           <ul>
             <li><a href="https://covidactnow.org/">Covid Act Now</a> for United States data <a href="https://apidocs.covidactnow.org/">(link to API)</a> </li>
             <li><a href="https://www.covid19india.org/">Covid 19 India</a> for Indian data <a href="https://apidocs.covidactnow.org/">(link to API)</a>) </li>
           </ul>
-          <hr>
-          <p class="h4">Undercounting</p>
-          For multiple reasons, official case and death counts in India have been massively underreported. News reports (<a href="https://www.nytimes.com/2021/04/24/world/asia/india-coronavirus-deaths.html">NYT</a>, <a href="https://edition.cnn.com/2021/04/27/india/india-covid-underreporting-intl-hnk-dst/index.html">CNN</a>, <a href="https://www.npr.org/sections/goatsandsoda/2021/04/30/992451165/india-is-counting-thousands-of-daily-covid-deaths-how-many-is-it-missing">NPR</a>) have found an underreporting factor of 25-30x, but we have accounted for only a factor of 10.
-          <hr>
-          <p class="h4">About Us</p>
-          The creator of this website is <a href="">Avijit Thawani</a>, a PhD student at USC working on Artifical Intelligence. While recovering from Covid-19, he created this website in a desperate attempt to help fellow Americans relate to Indians during this crisis. Every Indian you know is likely losing 2-4 acquaintances to Covid-19 <b>every day</b>. Help us <a href="https://youtu.be/n1uLu0-r2tI">Fight On</a>.
+
         </div>
         <!-- Modal footer -->
         <div class="modal-footer">
@@ -63,9 +64,12 @@
         <section id="text" class="text-justify py-4">
 
           <p class="h5">
-            Coronavirus is wreaking havoc in India. But India is huge and individual numbers may sound hollow.
-            Here you can add/remove cities and states - both <span style="color:red">Indian</span> and <span style="color:blue">American</span> - from the plot on the left, comparing their daily death counts as well as populations.
-            <a href="#" style="color:grey"  data-toggle="modal" data-target="#more"><u>Learn more</u></a> about the crisis and this website.
+            Coronavirus is wreaking havoc in India. India is huge and individual numbers may sound hollow. But this pandemic has been everywhere, so you probably remember what it was like during the worst days of the crisis in the US.
+            <span style="color:red">Indian</span> cities today are seeing many more daily deaths (Y axis) than <span style="color:blue">American</span> cities with similar populations (X axis) did at its peak in the US.
+
+            <br><br>
+            Toggle the below buttons to add/remove regions from the plot on the left. Learn <a href="#" style="color:grey"  data-toggle="modal" data-target="#more"><u>about</u></a> the crisis and this website.
+
           </p>
         </section>
         <div id="bspace" class="text-center p-1 h5">
@@ -75,7 +79,7 @@
   </body>
   <script src="https://d3js.org/d3.v4.js"></script>
   <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
   <script type="text/javascript" src="load-daily.js" defer></script>
   <!--script type="text/javascript" src="scatter.js" defer></script-->

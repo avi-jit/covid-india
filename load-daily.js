@@ -1,4 +1,10 @@
 
+// <span style="color:red">Indian</span> cities are seeing many more <span class="tooltip" data-toggle="tooltip" data-placement="top" title="Y axis">daily deaths <span class="tooltiptext"> Y axis </span> </span> today than <span style="color:blue">American</span> cities with similar <span class="tooltip" data-toggle="tooltip" data-placement="top" title="X axis">populations <span class="tooltiptext"> X axis </span> </span> did, when the pandemic was peaking in the US.
+
+$(document).ready(function(){
+  $('[data-toggle="tooltip"]').tooltip();
+});
+
 const figw = screen.width * 0.6 //900
 const figh = screen.height * 0.8 //720
 const popl = 7_000_000
@@ -9,72 +15,13 @@ const undercount = 10
 
 const dotcolors = {'India':'red', 'US':'blue'}
 const dotsize = {'city':3, 'state':5, 'nation':10}
-const btncolor = {'none':'light', 'block':'secondary'}
+//const btncolor = {'none':'light', 'block':'secondary'}
+const btncolor = ['light','secondary']
 
 // set the dimensions and margins of the graph
 var margin = {top: 10, right: 50, bottom: 60, left: 60},
     width = figw - margin.left - margin.right,
     height = figh - margin.top - margin.bottom;
-
-// append the svg object to the body of the page
-var svg = d3.select("#my_dataviz")
-  .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform",
-          "translate(" + margin.left + "," + margin.top + ")");
-
-  // text label for the x axis
-  svg.append("text")
-      .attr("transform",
-            "translate(" + (width/2) + " ," + (height + margin.top + 40) + ")")
-      .style("text-anchor", "middle")
-      .style('font-size','18')
-      .text("Population (log scale)");
-
-  // text label for the y axis
-  svg.append("text")
-    .attr("transform", "rotate(-90)")
-    .attr("y", 0 - margin.left)
-    .attr("x", 0 - (height / 2))
-    .attr("dy", "1em")
-    .style("text-anchor", "middle")
-    .style('font-size','18')
-    .text("Peak Daily Deaths (7 day avg)");
-
-//$.getScript("load.js", function(){
-var x = d3.scaleLog()
-  .domain([popl, popu])
-  .range([ 0, width ]);
-
-const m = 1_000_000
-var xAxis = d3.axisBottom(x)
-              .tickFormat(d3.format(".2s"))
-              .tickValues([7.5*m, 10*m, 20*m, 40*m, 100*m, 200*m, 300*m]);
-//xAxis = d3.svg.axis().orient("bottom").scale(x)
-
-svg.append("g")
-  .style('font-size','18')
-  .attr('class','grid')
-  .attr("transform", "translate(0," + height + ")")
-  .call(xAxis)
-  //.call(function make_x_gridlines() { return d3.axisBottom(x).ticks(5)}()
-  //        .tickSize(-height).tickFormat(""))
-
-// Add Y axis
-var y = d3.scaleLinear()
-//var y = d3.scaleLog()
-  .domain([deathl, deathu])
-  .range([ height, 0]);
-
-const ks = 1_000
-var yAxis = d3.axisLeft(y)
-              .tickFormat(d3.format(".1s"))
-              .tickValues([0, 2*ks, 5*ks, 10*ks, 15*ks, 20*ks, 30*ks, 50*ks])
-svg.append("g")
-  .style('font-size','18')
-  .call(yAxis);
 
 var p_metro = new Promise(function(passfn, failfn)
 {
@@ -239,86 +186,165 @@ var p_idistrict = new Promise(function(passfn, failfn)
   })
 })
 
-Promise.all([p_state, p_metro, p_us, p_idistrict, p_istate]).then(raw => {
-	//const data1 = raw[0]
-  data = []
-  defaults = ['CA', 'USA', 'Delhi', 'Maharashtra', 'Mumbai', 'WA', 'Bangalore', 'Chicago+', 'Tamil Nadu', 'Uttar Pradesh', 'New York+']
-  ignores = ['Murshidabad', 'Purba', 'Paschim', 'East', 'West', 'Nadia',
-            //'Bihar', 'Patna',
-            ]
-  raw.forEach(function(rows, i) {
-    rows.forEach(function(row) {
-      if (row[1] > popl && row[1] < popu && row[2] > deathl && row[2] < deathu && !ignores.includes(row[0]) )
-        {
-          if (defaults.includes(row[0])) { row.push('block') }
-          else {row.push('none')}
-          if (i <= 2) { row.push('US') } else { row.push('India')}
-          if (i%2==1) { row.push('city') }
-          else { if (i == 2) { row.push('nation') } else { row.push('state') }}
-          data.push(row)
-        }
+// append the svg object to the body of the page
+var svg = d3.select("#my_dataviz")
+  .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+  svg.append('text')
+      .attr("y", height/2)
+      .attr("x", width/2 - 200)
+      .text('Start Visualization')
+      .style('font-size','40')
+      //.attr('onclick','Start')
+      .attr('id','start')
+      .attr('fill','grey')
+      .attr('text-decoration','underline')
+      //.attr('class',"link-primary")
+      .style('cursor','pointer')
+
+$('#start').click(async function()
+{
+  $(this).css('display','none')
+  //await new Promise(r => setTimeout(r, 2000));
+
+  // text label for the x axis
+  svg.append("text")
+      .attr("transform",
+            "translate(" + (width/2) + " ," + (height + margin.top + 40) + ")")
+      .style("text-anchor", "middle")
+      .style('font-size','18')
+      .text("Population (log scale)");
+
+  // text label for the y axis
+  svg.append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 0 - margin.left)
+    .attr("x", 0 - (height / 2))
+    .attr("dy", "1em")
+    .style("text-anchor", "middle")
+    .style('font-size','18')
+    .text("Peak Daily Deaths (7 day avg)");
+
+  //$.getScript("load.js", function(){
+  var x = d3.scaleLog()
+    .domain([popl, popu])
+    .range([ 0, width ]);
+
+  const m = 1_000_000
+  var xAxis = d3.axisBottom(x)
+                .tickFormat(d3.format(".2s"))
+                .tickValues([7.5*m, 10*m, 20*m, 40*m, 100*m, 200*m, 300*m]);
+  //xAxis = d3.svg.axis().orient("bottom").scale(x)
+
+  svg.append("g")
+    .style('font-size','18')
+    .attr('class','grid')
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis)
+    //.call(function make_x_gridlines() { return d3.axisBottom(x).ticks(5)}()
+    //        .tickSize(-height).tickFormat(""))
+
+  // Add Y axis
+  var y = d3.scaleLinear()
+  //var y = d3.scaleLog()
+    .domain([deathl, deathu])
+    .range([ height, 0]);
+
+  const ks = 1_000
+  var yAxis = d3.axisLeft(y)
+                .tickFormat(d3.format(".1s"))
+                .tickValues([0, 2*ks, 5*ks, 10*ks, 15*ks, 20*ks, 30*ks, 50*ks])
+  svg.append("g")
+    .style('font-size','18')
+    .call(yAxis);
+
+  Promise.all([p_state, p_metro, p_us, p_idistrict, p_istate]).then(raw => {
+  	//const data1 = raw[0]
+    data = []
+    defaults = ['CA', 'USA', 'Delhi', 'Maharashtra', 'Mumbai', 'WA', 'Bangalore', 'Chicago+', 'Tamil Nadu', 'Uttar Pradesh', 'New York+']
+    ignores = ['Murshidabad', 'Purba', 'Paschim', 'East', 'West', 'Nadia',
+              //'Bihar', 'Patna',
+              ]
+    raw.forEach(function(rows, i) {
+      rows.forEach(function(row) {
+        if (row[1] > popl && row[1] < popu && row[2] > deathl && row[2] < deathu && !ignores.includes(row[0]) )
+          {
+            if (defaults.includes(row[0])) { row.push(1) } //opacity
+            else {row.push(0)}
+            if (i <= 2) { row.push('US') } else { row.push('India')}
+            if (i%2==1) { row.push('city') }
+            else { if (i == 2) { row.push('nation') } else { row.push('state') }}
+            data.push(row)
+          }
+      })
     })
-  })
 
-  console.log(data)
+    console.log(data)
 
-  var bspace = d3.select('#bspace')
-  //bspace.append('button').text("Button 2")
-  bspace.selectAll('b')
-        .data(data)
-        .enter()
-        .append('button')
-        .text(function(d){return d[0]})
-        .attr('class', function(d){ return 'btn m-1 btn-'+btncolor[d[3]] } )
-        .attr('data',function(d){return d[0].split('+')[0].split(' ')[0] +'@'+d[1]+'@'+d[2]+'@'+d[3]})
-        //.style("background-color", function(d) {
-        //  if (d[3] == 'block') { return 'yellow'}
-        //  else { return 'white'}
-        //  } );
-        //.attr('onclick','clickfn()')
+    var bspace = d3.select('#bspace')
+    //bspace.append('button').text("Button 2")
+    bspace.selectAll('b')
+          .data(data)
+          .enter()
+          .append('button')
+          .text(function(d){return d[0]})
+          .attr('class', function(d){ return 'btn m-1 btn-'+btncolor[d[3]] } )
+          .attr('data',function(d){return d[0].split('+')[0].split(' ')[0] +'@'+d[1]+'@'+d[2]+'@'+d[3]})
+          //.style("background-color", function(d) {
+          //  if (d[3] == 'block') { return 'yellow'}
+          //  else { return 'white'}
+          //  } );
+          //.attr('onclick','clickfn()')
 
-  // Add dots
-  svg.append('g')
-    .selectAll("dot")
-    .data(data)
-    .enter()
-    .append("circle")
-      .attr('class', function(d) { return d[0].split('+')[0].split(' ')[0]} )
-      .attr("cx", function (d) { return x(d[1]) } )
-      .attr("cy", function (d) { return y(d[2]) } )
-      .attr("r", function(d) { return dotsize[d[5]] } )
-      .style("fill", function (d) { return dotcolors[d[4]] } )
-      .style("display", function(d) { return d[3]} );
+    // Add dots
+    svg.append('g')
+      .selectAll("dot")
+      .data(data)
+      .enter()
+      .append("circle")
+        .attr('class', function(d) { return d[0].split('+')[0].split(' ')[0]} )
+        .attr("cx", function (d) { return x(d[1]) } )
+        .attr("cy", function (d) { return y(d[2]) } )
+        .attr("r", function(d) { return dotsize[d[5]] } )
+        .style("fill", function (d) { return dotcolors[d[4]] } )
+        .style('opacity', function(d) { return parseInt(d[3]) } )
+        //.style("display", function(d) { return d[3]} )
 
-  // Add labels
-  svg.append('g')
-    .selectAll("label")
-    .data(data)
-    .enter()
-    .append("text")
-      .attr('class', function(d) { return d[0].split('+')[0].split(' ')[0] } )
-      .attr("x", function (d) { return x(d[1]) + dotsize[d[5]] } )
-      .attr("y", function (d) { return y(d[2]) + 5 } )
-      .attr("font-size","18")
-      .text(function (d) { return d[0] })
-      .style("display", function(d) { return d[3]} );
+    // Add labels
+    svg.append('g')
+      .selectAll("label")
+      .data(data)
+      .enter()
+      .append("text")
+        .attr('class', function(d) {return d[0].split('+')[0].split(' ')[0]})
+        .attr("x", function (d) { return x(d[1]) + dotsize[d[5]] } )
+        .attr("y", function (d) { return y(d[2]) + 5 } )
+        .attr("font-size","18")
+        .text(function (d) { return d[0] })
+        .style("opacity", function(d) { return d[3]} )
+        //.style("display", function(d) { return d[3]} );
 
-  $('.btn').click(function(){
-    var d = $(this).attr('data').split('@')
-    //console.log('button: '+d)
-    //d[1] = parseInt(d[1])
-    //d[2] = parseInt(d[2])
+    $('.btn').click(function(){
+      var d = $(this).attr('data').split('@')
+      console.log('button: '+d)
+      //d[1] = parseInt(d[1])
+      //d[2] = parseInt(d[2])
 
-    var color
-    if (d[3] == 'block') { d[3] = 'none'} else { d[3] = 'block'}
-    //console.log(d.join('@'))
+      d[3] = 1 - parseInt(d[3])
+      //if (d[3] == 'block') { d[3] = 'none'} else { d[3] = 'block'}
+      //console.log(d.join('@'))
 
-    //$('.'+d[0]).style.display = d[3]
-    $('.'+d[0]).css("display", d[3])
-    $(this).attr('data', d.join('@'))
-    //$(this).css('background-color', color)
-    $(this).attr('class', 'btn m-1 btn-'+btncolor[d[3]])
+      //$('.'+d[0]).css("display", d[3]) // jQuery
+      d3.select('.'+d[0]).transition().duration(500).style("opacity",d[3])//d3
 
+      $(this).attr('data', d.join('@'))
+      $(this).attr('class', 'btn m-1 btn-'+btncolor[d[3]])
+
+    })
   })
 })
 
