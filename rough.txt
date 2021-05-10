@@ -33,3 +33,10 @@ function sleep(milliseconds) {
     currentDate = Date.now();
   } while (currentDate - date < milliseconds);
 }
+
+
+${$(this).css('opacity')}
+html = `<rect class='${$(this).attr('class').split(' ')[0]} bbox'  width=${bbox.width + (padding*2)} height=${bbox.height + (padding*2)} x=${bbox.x - padding} y=${bbox.y - padding} style="fill:red; stroke:black; stroke-width:3; opacity:1"/>`
+console.log(html)
+//$('#labels').insertBefore( html , $(this)[0]);
+//$('#labels').append(html)

@@ -5,11 +5,23 @@ const popu = 350_000_000
 const deathl = -1_000
 const deathu = 15_000
 const undercount = 10
-var wait = 5000
-var transit = 1000
+var wait = 500
+var transit = 200
+var skip = false
+
+$('#skip').click(function(){
+  skip = true;
+  // switch to restart
+  $(this).text("Restart Interactive")
+  $(this).attr('id','restart')
+  //$(this).attr('href','./scatter.html') // reloads
+  $('#restart').click(function(){
+    window.location.reload();
+  })
+})
 
 const dotcolors = {'India':'red', 'US':'blue'}
-const dotsize = {'city':3, 'state':5, 'nation':10}
+const dotsize = {'city':5, 'state':5, 'nation':5}
 //const btncolor = {'none':'light', 'block':'secondary'}
 const btncolor = ['light','secondary']
 
@@ -261,10 +273,10 @@ $('#start').click(async function()
     .domain([deathl, deathu])
     .range([ height, 0]);
 
-  const ks = 1_000
+  const K = 1_000
   var yAxis = d3.axisLeft(y)
                 .tickFormat(d3.format(".1s"))
-                .tickValues([0, 1*ks, 2*ks, 5*ks, 10*ks, 15*ks, 20*ks, 30*ks, 50*ks])
+                .tickValues([0, 1*K, 2*K, 5*K, 10*K, 15*K, 20*K, 30*K, 50*K])
 
   svg.append("g")
     .style('opacity',0)
@@ -273,10 +285,6 @@ $('#start').click(async function()
     .attr('id','yaxis')
 
   d3.select('#yaxis').transition().duration(transit).style('opacity',1)
-  await new Promise(r => setTimeout(r, wait));
-
-  text = "Let's see how bad things are in Bangalore, India's Silicon Valley."
-  write(text)
   await new Promise(r => setTimeout(r, wait));
 
   Promise.all([p_state, p_metro, p_us, p_idistrict, p_istate]).then(async function(raw){
@@ -303,13 +311,17 @@ $('#start').click(async function()
 
     console.log(data)
 
+    text = "Let's see how bad things are in Bangalore, India's Silicon Valley."
+    write(text)
+    await new Promise(r => setTimeout(r, wait));
+
     // Add dots
     svg.append('g')
       .selectAll("dot")
       .data(data)
       .enter()
       .append("circle")
-        .attr('class', function(d) { return d[0].split('+')[0].split(' ')[0]} )
+        .attr('class', function(d) { return d[0].split('+')[0].split(' ')[0] + ' dot'} )
         .attr("cx", function (d) { return x(d[1]) } )
         .attr("cy", function (d) { return y(d[2]) } )
         .attr("r", function(d) { return dotsize[d[5]] } )
@@ -319,17 +331,37 @@ $('#start').click(async function()
 
     // Add labels
     svg.append('g')
+      .attr('id','labels')
       .selectAll("label")
       .data(data)
       .enter()
       .append("text")
-        .attr('class', function(d) {return d[0].split('+')[0].split(' ')[0]})
+        .attr('class', function(d) {return d[0].split('+')[0].split(' ')[0] + ' label' })
         .attr("x", function (d) { return x(d[1]) + dotsize[d[5]] } )
         .attr("y", function (d) { return y(d[2]) + 5 } )
-        .attr("font-size","18")
+        .attr("font-size", "18")
         .text(function (d) { return d[0] })
         .style("opacity", function(d) { return parseInt(d[3]) } )
         //.style("display", function(d) { return d[3]} );
+
+    padding = 2
+    $(".label").each(function() {
+      //console.log( index + ": " + $(this)[0] )
+      bbox = $(this)[0].getBBox()
+      //console.log(bbox)
+      d3.select("#labels")
+        .insert('rect', `.${$(this).attr('class').split(' ')[0]}`)
+        .attr('class',$(this).attr('class').split(' ')[0]+' bbox')
+        .attr('x', bbox.x - padding)
+        .attr('y', bbox.y - padding)
+        .attr('width', bbox.width + (padding*2))
+        .attr('height', bbox.height + (padding*2))
+        .style('opacity',$(this).css('opacity'))
+        .style('fill','white')
+        .style('stroke','black')
+        .style('stroke-width',1)
+    });
+
 
     //////////////////////////////////////////////////////////////////////////
     // Add Bangalore
@@ -374,6 +406,7 @@ $('#start').click(async function()
         d[3] = 1 // helps in activating button later
         d3.select('.Los').transition().duration(transit).style("opacity",1)
         d3.select('text.Los').transition().duration(transit).style("opacity",1)
+        d3.select('rect.Los').transition().duration(transit).style("opacity",1)
       }
     })
     text = "Oh there's the LA metropolitan area! Bangalore seems to be a little smaller than LA's worst day, yet has more cases. <br><br>Note: LA (and all of US) peaked around new year while India is peaking mid May."
@@ -391,6 +424,7 @@ $('#start').click(async function()
         d[3] = 1 // helps in activating button later
         d3.select('.Mumbai').transition().duration(transit).style("opacity",1)
         d3.select('text.Mumbai').transition().duration(transit).style("opacity",1)
+        d3.select('rect.Mumbai').transition().duration(transit).style("opacity",1)
       }
     })
 
@@ -410,6 +444,7 @@ $('#start').click(async function()
         d[3] = 1 // helps in activating button later
         d3.select('.CA').transition().duration(transit).style("opacity",1)
         d3.select('text.CA').transition().duration(transit).style("opacity",1)
+        d3.select('rect.CA').transition().duration(transit).style("opacity",1)
       }
     })
 
@@ -428,6 +463,7 @@ $('#start').click(async function()
         d[3] = 1 // helps in activating button later
         d3.select('.Maharashtra').transition().duration(transit).style("opacity",1)
         d3.select('text.Maharashtra').transition().duration(transit).style("opacity",1)
+        d3.select('rect.Maharashtra').transition().duration(transit).style("opacity",1)
       }
     })
 
@@ -447,6 +483,7 @@ $('#start').click(async function()
         d[3] = 1 // helps in activating button later
         d3.select('.USA').transition().duration(transit).style("opacity",1)
         d3.select('text.USA').transition().duration(transit).style("opacity",1)
+        d3.select('rect.USA').transition().duration(transit).style("opacity",1)
       }
     })
 
@@ -480,6 +517,7 @@ $('#start').click(async function()
       //$('.'+d[0]).css("display", d[3]) // jQuery
       d3.select('.'+d[0]).transition().duration(transit).style("opacity",d[3])
       d3.select('text.'+d[0]).transition().duration(transit).style("opacity",d[3])
+      d3.select('rect.'+d[0]).transition().duration(transit).style("opacity",d[3])
 
       $(this).attr('data', d.join('@'))
       $(this).attr('class', 'btn m-1 btn-'+btncolor[d[3]])
