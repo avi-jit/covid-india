@@ -243,7 +243,7 @@ $('#start').click(async function()
   {
     text = "This website helps Americans relate to the mind-boggling statistics of the latest Covid-19 wave in India.<br><br>Let's begin."
     write(text)
-    await new Promise(r => setTimeout(r, 5*K));
+    await new Promise(r => setTimeout(r, 3*K));
     d3.select('#temp').transition().duration(transit).style('opacity',0)
   }
   $("#start").remove();
@@ -266,7 +266,7 @@ $('#start').click(async function()
     {
       text = "The most reliant metric for pandemic severity is the Daily Death Rate (averaged over 7 days). <br><br>We will show these on the Y axis."
       write(text)
-      await new Promise(r => setTimeout(r, 5*K));
+      await new Promise(r => setTimeout(r, 6*K));
     }
 
   //$.getScript("load.js", function(){
@@ -297,7 +297,7 @@ $('#start').click(async function()
 
 
     d3.select('#yaxis').transition().duration(transit).style('opacity',1)
-    if (!skip) { await new Promise(r => setTimeout(r, 3*K)); }
+    if (!skip) { await new Promise(r => setTimeout(r, 4*K)); }
     else {}
 
   Promise.all([p_state, p_metro, p_us, p_idistrict, p_istate]).then(async function(raw){
@@ -328,7 +328,7 @@ $('#start').click(async function()
     {
       text = "Let's see how bad things are in Bangalore, India's Silicon Valley."
       write(text)
-      await new Promise(r => setTimeout(r, 4*K));
+      await new Promise(r => setTimeout(r, 5*K));
     }
 
     // Add dots
@@ -387,7 +387,7 @@ $('#start').click(async function()
     {
       text = "Hmmm ... so we have a number. But we <u><a style='color:grey' href='https://g.co/kgs/5GBev9'>should never leave a number alone</a></u>. <br><br>Let's use our X axis now to add another dimension."
       write(text)
-      await new Promise(r => setTimeout(r, 7*K));
+      await new Promise(r => setTimeout(r, 9*K));
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -406,7 +406,7 @@ $('#start').click(async function()
     {
       text = "Better! We now see the population of Bangalore on a log scale. <br><br>But wouldn't it be better to compare these figures to cities from the US which we know better?"
       write(text)
-      await new Promise(r => setTimeout(r, 7*K));
+      await new Promise(r => setTimeout(r, 9*K));
     }
 
     // text label for the x axis
@@ -435,7 +435,7 @@ $('#start').click(async function()
     {
       text = "Oh there's the LA metropolitan area! Bangalore seems to be a little smaller than LA's worst day, yet has more cases. <br><br>Note: LA (and all of US) peaked around new year while India is peaking mid May."
       write(text)
-      await new Promise(r => setTimeout(r, 7*K));
+      await new Promise(r => setTimeout(r, 9*K));
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -457,7 +457,7 @@ $('#start').click(async function()
     {
       text = "Uh oh. Mumbai is way way worse, despite also having roughly the same population as LA or Bangalore. <br><br>Mumbai is both India's financial capital as well as the home to Bollywood: think LA and NYC in one."
       write(text)
-      await new Promise(r => setTimeout(r, 7*K));
+      await new Promise(r => setTimeout(r, 9*K));
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -479,7 +479,7 @@ $('#start').click(async function()
     {
       text = "Let's also see stats at the state level. There's California. Wonder how the most populous states of India are doing."
       write(text)
-      await new Promise(r => setTimeout(r, 5*K));
+      await new Promise(r => setTimeout(r, 7*K));
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -501,7 +501,7 @@ $('#start').click(async function()
     {
       text = "India's worst faring state is Maharashtra, home to both Mumbai - the largest epicenter - but also ironically to Serum Institute - world's largest Covid-19 vacccine manufacturer."
       write(text)
-      await new Promise(r => setTimeout(r, 7*K));
+      await new Promise(r => setTimeout(r, 9*K));
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -523,7 +523,7 @@ $('#start').click(async function()
     {
       text = "The situtaion looks worse when we plot all of US. Mumbai has been seeing more (estimated) daily deaths than all of America combined! <br><br>Unfortunately, we could not show all of India here because it lies outside the graph."
       write(text)
-      await new Promise(r => setTimeout(r, 8*K));
+      await new Promise(r => setTimeout(r, 10*K));
     }
     text = "Continue to toggle the buttons below to add or remove more regions from the plot on the left. <br><br>Disclaimer: We also account for Indian undercounting. Learn <a href='#' style='color:grey' data-toggle='modal' data-target='#more'><u>about</u></a> the crisis and this website."
     write(text)
