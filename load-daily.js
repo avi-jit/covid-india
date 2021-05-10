@@ -8,16 +8,25 @@ const undercount = 10
 var wait = 500
 var transit = 200
 var skip = false
+const K = 1_000
+var started = false
+
+function write(text){
+  d3.select("#text").html("") // start from scratch
+  d3.select('#text').append('p')
+                    .style('opacity',0).attr('id','temp').attr('class','h3')
+  d3.select('#temp').html(text)
+  d3.select('#temp').transition().duration(transit).style('opacity',1)
+}
 
 $('#skip').click(function(){
   skip = true;
+  transit = 1;
+  $('#start').click()
   // switch to restart
-  $(this).text("Restart Interactive")
-  $(this).attr('id','restart')
-  //$(this).attr('href','./scatter.html') // reloads
-  $('#restart').click(function(){
-    window.location.reload();
-  })
+  text = "Hope that helped. Continue to toggle the buttons below to add or remove more regions from the plot on the left. <br><br>Disclaimer: We also account for Indian undercounting. Learn <a href='#' style='color:grey' data-toggle='modal' data-target='#more'><u>about</u></a> the crisis and this website."
+  write(text)
+
 })
 
 const dotcolors = {'India':'red', 'US':'blue'}
@@ -216,27 +225,28 @@ var svg = d3.select("#my_dataviz")
 
 $('#start').click(async function()
 {
+  if (started) { return; }
+  started = true
   console.log('starting...')
+
+  //d3.select('#start').transition().duration(transit).style('opacity',0)
   d3.select('#start').transition().duration(transit).style('opacity',0)
   //$(this).css('display','none')
   //await new Promise(r => setTimeout(r, 2000));
 
-  function write(text){
-    d3.select("#text").html("") // start from scratch
-    d3.select('#text').append('p')
-                      .style('opacity',0).attr('id','temp').attr('class','h3')
-    d3.select('#temp').html(text)
-    d3.select('#temp').transition().duration(transit).style('opacity',1)
-  }
 
   //////////////////////////////////////////////////////////////////////////
   // Add Intro
   //////////////////////////////////////////////////////////////////////////
 
-  text = "This website helps Americans relate to the mind-boggling statistics of the latest Covid-19 wave in India.<br><br>Let's begin."
-  write(text)
-  await new Promise(r => setTimeout(r, wait));
-  d3.select('#temp').transition().duration(transit).style('opacity',0)
+  if (!skip)
+  {
+    text = "This website helps Americans relate to the mind-boggling statistics of the latest Covid-19 wave in India.<br><br>Let's begin."
+    write(text)
+    await new Promise(r => setTimeout(r, 5*K));
+    d3.select('#temp').transition().duration(transit).style('opacity',0)
+  }
+  $("#start").remove();
 
   //////////////////////////////////////////////////////////////////////////
   // Add Y axis
@@ -252,10 +262,12 @@ $('#start').click(async function()
     .style('font-size','18')
     .text("Peak Daily Deaths (7 day avg)");
 
-  text = "The most reliant metric for pandemic severity is the Daily Death Rate (averaged over 7 days). <br><br>We will show these on the Y axis."
-  write(text)
-  await new Promise(r => setTimeout(r, wait/2));
-
+    if (!skip)
+    {
+      text = "The most reliant metric for pandemic severity is the Daily Death Rate (averaged over 7 days). <br><br>We will show these on the Y axis."
+      write(text)
+      await new Promise(r => setTimeout(r, 5*K));
+    }
 
   //$.getScript("load.js", function(){
   var x = d3.scaleLog()
@@ -273,7 +285,6 @@ $('#start').click(async function()
     .domain([deathl, deathu])
     .range([ height, 0]);
 
-  const K = 1_000
   var yAxis = d3.axisLeft(y)
                 .tickFormat(d3.format(".1s"))
                 .tickValues([0, 1*K, 2*K, 5*K, 10*K, 15*K, 20*K, 30*K, 50*K])
@@ -284,8 +295,10 @@ $('#start').click(async function()
     .call(yAxis)
     .attr('id','yaxis')
 
-  d3.select('#yaxis').transition().duration(transit).style('opacity',1)
-  await new Promise(r => setTimeout(r, wait));
+
+    d3.select('#yaxis').transition().duration(transit).style('opacity',1)
+    if (!skip) { await new Promise(r => setTimeout(r, 3*K)); }
+    else {}
 
   Promise.all([p_state, p_metro, p_us, p_idistrict, p_istate]).then(async function(raw){
   	//const data1 = raw[0]
@@ -311,9 +324,12 @@ $('#start').click(async function()
 
     console.log(data)
 
-    text = "Let's see how bad things are in Bangalore, India's Silicon Valley."
-    write(text)
-    await new Promise(r => setTimeout(r, wait));
+    if (!skip)
+    {
+      text = "Let's see how bad things are in Bangalore, India's Silicon Valley."
+      write(text)
+      await new Promise(r => setTimeout(r, 4*K));
+    }
 
     // Add dots
     svg.append('g')
@@ -367,9 +383,12 @@ $('#start').click(async function()
     // Add Bangalore
     //////////////////////////////////////////////////////////////////////////
 
-    text = "Hmmm ... so we have a number. But we <u><a style='color:grey' href='https://g.co/kgs/5GBev9'>should never leave a number alone</a></u>. <br><br>Let's use our X axis now to add another dimension."
-    write(text)
-    await new Promise(r => setTimeout(r, wait));
+    if (!skip)
+    {
+      text = "Hmmm ... so we have a number. But we <u><a style='color:grey' href='https://g.co/kgs/5GBev9'>should never leave a number alone</a></u>. <br><br>Let's use our X axis now to add another dimension."
+      write(text)
+      await new Promise(r => setTimeout(r, 7*K));
+    }
 
     //////////////////////////////////////////////////////////////////////////
     // Add X axis
@@ -383,9 +402,12 @@ $('#start').click(async function()
       //.call(function make_x_gridlines() { return d3.axisBottom(x).ticks(5)}()
       //        .tickSize(-height).tickFormat(""))
 
-    text = "Better! We now see the population of Bangalore on a log scale. <br><br>But wouldn't it be better to compare these figures to cities from the US which we know better?"
-    write(text)
-    await new Promise(r => setTimeout(r, wait));
+    if (!skip)
+    {
+      text = "Better! We now see the population of Bangalore on a log scale. <br><br>But wouldn't it be better to compare these figures to cities from the US which we know better?"
+      write(text)
+      await new Promise(r => setTimeout(r, 7*K));
+    }
 
     // text label for the x axis
     svg.append("text")
@@ -409,9 +431,12 @@ $('#start').click(async function()
         d3.select('rect.Los').transition().duration(transit).style("opacity",1)
       }
     })
-    text = "Oh there's the LA metropolitan area! Bangalore seems to be a little smaller than LA's worst day, yet has more cases. <br><br>Note: LA (and all of US) peaked around new year while India is peaking mid May."
-    write(text)
-    await new Promise(r => setTimeout(r, wait));
+    if (!skip)
+    {
+      text = "Oh there's the LA metropolitan area! Bangalore seems to be a little smaller than LA's worst day, yet has more cases. <br><br>Note: LA (and all of US) peaked around new year while India is peaking mid May."
+      write(text)
+      await new Promise(r => setTimeout(r, 7*K));
+    }
 
     //////////////////////////////////////////////////////////////////////////
     // Add Mumbai
@@ -428,10 +453,12 @@ $('#start').click(async function()
       }
     })
 
-    text = "Uh oh. Mumbai is way way worse, despite also having roughly the same population as LA or Bangalore. <br><br>Mumbai is both India's financial capital as well as the home to Bollywood: think LA and NYC in one."
-    write(text)
-    await new Promise(r => setTimeout(r, wait));
-
+    if (!skip)
+    {
+      text = "Uh oh. Mumbai is way way worse, despite also having roughly the same population as LA or Bangalore. <br><br>Mumbai is both India's financial capital as well as the home to Bollywood: think LA and NYC in one."
+      write(text)
+      await new Promise(r => setTimeout(r, 7*K));
+    }
 
     //////////////////////////////////////////////////////////////////////////
     // Add CA
@@ -448,9 +475,12 @@ $('#start').click(async function()
       }
     })
 
-    text = "Let's also see stats at the state level. There's California. Wonder how the most populous states of India are doing ..."
-    write(text)
-    await new Promise(r => setTimeout(r, wait));
+    if (!skip)
+    {
+      text = "Let's also see stats at the state level. There's California. Wonder how the most populous states of India are doing."
+      write(text)
+      await new Promise(r => setTimeout(r, 5*K));
+    }
 
     //////////////////////////////////////////////////////////////////////////
     // Add Maharashtra
@@ -467,10 +497,12 @@ $('#start').click(async function()
       }
     })
 
-    text = "India's worst faring state is Maharashtra, home to both Mumbai - the largest epicenter - but also ironically to Serum Institute - world's largest Covid-19 vacccine manufacturer."
-    write(text)
-    await new Promise(r => setTimeout(r, wait));
-
+    if (!skip)
+    {
+      text = "India's worst faring state is Maharashtra, home to both Mumbai - the largest epicenter - but also ironically to Serum Institute - world's largest Covid-19 vacccine manufacturer."
+      write(text)
+      await new Promise(r => setTimeout(r, 7*K));
+    }
 
     //////////////////////////////////////////////////////////////////////////
     // Add US
@@ -487,13 +519,15 @@ $('#start').click(async function()
       }
     })
 
-    text = "The situtaion looks worse when we plot all of US. Mumbai has been seeing more (estimated) daily deaths than all of America combined! <br><br>Unfortunately, we could not show all of India here because it lies outside the graph."
+    if (!skip)
+    {
+      text = "The situtaion looks worse when we plot all of US. Mumbai has been seeing more (estimated) daily deaths than all of America combined! <br><br>Unfortunately, we could not show all of India here because it lies outside the graph."
+      write(text)
+      await new Promise(r => setTimeout(r, 8*K));
+    }
+    text = "Continue to toggle the buttons below to add or remove more regions from the plot on the left. <br><br>Disclaimer: We also account for Indian undercounting. Learn <a href='#' style='color:grey' data-toggle='modal' data-target='#more'><u>about</u></a> the crisis and this website."
     write(text)
-    await new Promise(r => setTimeout(r, wait));
-
-    text = "Hope that helped. Continue to toggle the buttons below to add or remove more regions from the plot on the left. <br><br>Disclaimer: We also account for Indian undercounting. Learn <a href='#' style='color:grey' data-toggle='modal' data-target='#more'><u>about</u></a> the crisis and this website."
-    write(text)
-    await new Promise(r => setTimeout(r, wait));
+    if (!skip) { await new Promise(r => setTimeout(r, 5*K)); }
 
     var bspace = d3.select('#bspace')
     //bspace.append('button').text("Button 2")
@@ -505,6 +539,10 @@ $('#start').click(async function()
           .attr('class', function(d){ return 'btn m-1 btn-'+btncolor[d[3]] } )
           .attr('data',function(d){return d[0].split('+')[0].split(' ')[0] +'@'+d[1]+'@'+d[2]+'@'+d[3]})
 
+    $('#skip').text("Restart Interactive")
+    $('#skip').attr('id','restart')
+    //$(this).attr('href','./scatter.html') // reloads
+    $('#restart').click(function(){ window.location.reload(); })
 
     $('.btn').click(function(){
       var d = $(this).attr('data').split('@')
@@ -515,14 +553,14 @@ $('#start').click(async function()
       //console.log(d.join('@'))
 
       //$('.'+d[0]).css("display", d[3]) // jQuery
-      d3.select('.'+d[0]).transition().duration(transit).style("opacity",d[3])
-      d3.select('text.'+d[0]).transition().duration(transit).style("opacity",d[3])
-      d3.select('rect.'+d[0]).transition().duration(transit).style("opacity",d[3])
+      d3.select('.'+d[0]).transition().duration(1000).style("opacity",d[3])
+      d3.select('text.'+d[0]).transition().duration(1000).style("opacity",d[3])
+      d3.select('rect.'+d[0]).transition().duration(1000).style("opacity",d[3])
 
       $(this).attr('data', d.join('@'))
       $(this).attr('class', 'btn m-1 btn-'+btncolor[d[3]])
-
     })
+
   })
 
 })
